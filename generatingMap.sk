@@ -1,0 +1,429 @@
+#
+#Github https://github.com/MCGameSK/Dungeon-Map-Generator
+#
+
+
+
+options:
+    ThrottleCount: 2000
+
+
+
+command /generateCenter:
+    trigger:
+        if player is op:
+            set {generateCenter} to location of block at player
+            message "&a&lCenter Saved at your location"
+        else:
+            message "&c&oOP required"
+
+
+
+command /generateStart [<integer>]:
+    trigger:
+        if player is op:
+            if {generateCenter} is not set:
+                message "&4&lThere is no center!"
+                exit
+
+            if arg is not set:
+                message "&4&lThere is no arg for generating, write number under 100"
+                exit
+
+            if arg 1 > 100:
+                message "&4&lHuge arg detected!"
+                exit
+
+            message "&e&lStart Generating..."
+
+            wait for 5 tick
+
+            #Create New Map Data
+            message "&7&oCreating Map Data"
+
+            set {_map::1::1} to 0
+            loop arg 1 times:
+                loop arg 1 times:
+                    if chance of 48%:
+                        set {_map::%loop-number-1%::%loop-number-2%} to 1
+                    else:
+                        set {_map::%loop-number-1%::%loop-number-2%} to 0
+
+            wait for 5 tick
+
+            #Making Data To Smooth
+            message "&7&oMaking Map Smooth"
+
+            loop 4 times:
+                loop arg 1 times:
+                    loop arg 1 times:
+                        if loop-number-2 is not 1 or arg 1:
+                            if loop-number-3 is not 1 or arg 1:
+                                set {_isBlock} to 0
+                                if {_map::%(loop-number-2) - 1%::%(loop-number-3) - 1%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2) - 1%::%(loop-number-3)%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2) - 1%::%(loop-number-3) + 1%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2)%::%(loop-number-3) - 1%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2)%::%(loop-number-3) + 1%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2) + 1%::%(loop-number-3) - 1%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2) + 1%::%(loop-number-3)%} is 1:
+                                    add 1 to {_isBlock}
+                                if {_map::%(loop-number-2) + 1%::%(loop-number-3) + 1%} is 1:
+                                    add 1 to {_isBlock}
+                                
+                                if {_isBlock} > 4:
+                                    set {_map::%loop-number-2%::%loop-number-3%} to 1
+                                if {_isBlock} < 4:
+                                    set {_map::%loop-number-2%::%loop-number-3%} to 0
+
+            wait for 5 tick
+
+            #Wiping Place
+            message "&7&oWiping The Area"
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    set {_centerApply} to {generateCenter}
+                    remove round(arg 1 / 2) from x-coord of {_centerApply}
+                    remove round(arg 1 / 2) from z-coord of {_centerApply}
+                    add loop-number-1 to x-coord of {_centerApply}
+                    add loop-number-2 to z-coord of {_centerApply}
+
+                    remove 1 from y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+                    add 1 to y-coord of {_centerApply}
+                    delete block at {_centerApply}
+
+                    add 8 to {_throttle}
+                    if {_throttle} > {@ThrottleCount}:
+                        set {_throttle} to 0
+                        wait for 4 ticks
+
+            wait for 5 tick
+
+            #Placing Blocks By Map
+            message "&7&oPlacing Blocks By Map Data"
+
+            #Wall
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    if {_map::%loop-number-1%::%loop-number-2%} is 1:
+                        set {_centerApply} to {generateCenter}
+                        remove round(arg 1 / 2) from x-coord of {_centerApply}
+                        remove round(arg 1 / 2) from z-coord of {_centerApply}
+                        add loop-number-1 to x-coord of {_centerApply}
+                        add loop-number-2 to z-coord of {_centerApply}
+
+                        add 1 to y-coord of {_centerApply}
+                        if chance of 70%:
+                            set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to cracked polished blackstone bricks
+                        set block at {_centerApply} to {_mainBlock}
+
+                        add 1 to y-coord of {_centerApply}
+                        if chance of 70%:
+                            set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to cracked polished blackstone bricks
+                        set block at {_centerApply} to {_mainBlock}
+
+                        add 1 to y-coord of {_centerApply}
+                        if chance of 70%:
+                            set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to cracked polished blackstone bricks
+                        set block at {_centerApply} to {_mainBlock}
+
+                        add 1 to y-coord of {_centerApply}
+                        if chance of 70%:
+                            set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to cracked polished blackstone bricks
+                        set block at {_centerApply} to {_mainBlock}
+
+                        add 4 to {_throttle}
+                        if {_throttle} > {@ThrottleCount}:
+                            set {_throttle} to 0
+                            wait for 2 ticks
+
+            wait for 5 tick
+
+            #Floor
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    set {_centerApply} to {generateCenter}
+                    remove round(arg 1 / 2) from x-coord of {_centerApply}
+                    remove round(arg 1 / 2) from z-coord of {_centerApply}
+                    add loop-number-1 to x-coord of {_centerApply}
+                    add loop-number-2 to z-coord of {_centerApply}
+
+                    if chance of 80%:
+                        set {_mainBlock} to polished blackstone bricks
+                    else if chance of 60%:
+                        set {_mainBlock} to cracked polished blackstone bricks
+                    else if chance of 20%:
+                        set {_mainBlock} to polished blackstone wall
+                    else if chance of 40%:
+                        if chance of 90%:
+                            set {_mainBlock} to polished blackstone brick stairs
+                        else:
+                            set {_mainBlock} to polished blackstone brick stairs[waterlogged=true]
+                    else if chance of 60%:
+                        set {_mainBlock} to chiseled polished blackstone
+                    else:
+                        set {_mainBlock} to gilded blackstone
+
+                    set block at {_centerApply} to {_mainBlock}
+
+                    add 1 to {_throttle}
+                    if {_throttle} > {@ThrottleCount}:
+                        set {_throttle} to 0
+                        wait for 1 ticks
+                        
+            wait for 5 ticks
+
+            #Ceiling
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    set {_centerApply} to {generateCenter}
+                    remove round(arg 1 / 2) from x-coord of {_centerApply}
+                    remove round(arg 1 / 2) from z-coord of {_centerApply}
+                    add loop-number-1 to x-coord of {_centerApply}
+                    add loop-number-2 to z-coord of {_centerApply}
+                    add 5 to y-coord of {_centerApply}
+
+
+                    if {_map::%loop-number-1%::%loop-number-2%} is 1:
+                        if chance of 80%:
+                            set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to cracked polished blackstone bricks
+                    else:
+                        if chance of 90%:
+                            if chance of 10%:
+                                set {_mainBlock} to cracked polished blackstone bricks
+                            else:
+                                set {_mainBlock} to polished blackstone bricks
+                        else:
+                            set {_mainBlock} to polished blackstone brick slab[type=top]
+
+                    set block at {_centerApply} to {_mainBlock}
+
+                    add 1 to {_throttle}
+                    if {_throttle} > {@ThrottleCount}:
+                        set {_throttle} to 0
+                        wait for 1 ticks
+
+            wait for 5 tick
+
+            #Bordering
+            message "&7&oBordering With Bedrock"
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+
+                    #Bottom
+                    set {_centerApply} to {generateCenter}
+                    remove round(arg 1 / 2) from x-coord of {_centerApply}
+                    remove round(arg 1 / 2) from z-coord of {_centerApply}
+                    add loop-number-1 to x-coord of {_centerApply}
+                    add loop-number-2 to z-coord of {_centerApply}
+                    remove 1 from y-coord of {_centerApply}
+
+                    set block at {_centerApply} to bedrock
+
+                    add 1 to {_throttle}
+                    if {_throttle} > {@ThrottleCount}:
+                        set {_throttle} to 0
+                        wait for 1 ticks
+
+                    #Top
+                    add 7 to y-coord of {_centerApply}
+
+                    set block at {_centerApply} to bedrock
+
+                    add 1 to {_throttle}
+                    if {_throttle} > {@ThrottleCount}:
+                        set {_throttle} to 0
+                        wait for 1 ticks
+
+                    #Side-1
+                    if loop-number-1 is 1 or arg 1:
+                        set {_centerApply} to {generateCenter}
+                        remove round(arg 1 / 2) from x-coord of {_centerApply}
+                        remove round(arg 1 / 2) from z-coord of {_centerApply}
+                        add loop-number-1 to x-coord of {_centerApply}
+                        add loop-number-2 to z-coord of {_centerApply}
+
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+
+                        add 6 to {_throttle}
+                        if {_throttle} > {@ThrottleCount}:
+                            set {_throttle} to 0
+                            wait for 3 ticks
+                    #Side-2
+                    if loop-number-2 is 1 or arg 1:
+                        set {_centerApply} to {generateCenter}
+                        remove round(arg 1 / 2) from x-coord of {_centerApply}
+                        remove round(arg 1 / 2) from z-coord of {_centerApply}
+                        add loop-number-1 to x-coord of {_centerApply}
+                        add loop-number-2 to z-coord of {_centerApply}
+
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+                        add 1 to y-coord of {_centerApply}
+                        set block at {_centerApply} to bedrock
+
+                        add 6 to {_throttle}
+                        if {_throttle} > {@ThrottleCount}:
+                            set {_throttle} to 0
+                            wait for 3 ticks
+
+            wait for 5 ticks
+
+            #Lighting
+            message "&7&oPlacing Lanterns"
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    if loop-number-1 is not 1 or arg 1:
+                        if loop-number-2 is not 1 or arg 1:
+                            if {_map::%loop-number-1%::%loop-number-2%} is 0:
+                                set {_centerApply} to {generateCenter}
+                                remove round(arg 1 / 2) from x-coord of {_centerApply}
+                                remove round(arg 1 / 2) from z-coord of {_centerApply}
+                                add loop-number-1 to x-coord of {_centerApply}
+                                add loop-number-2 to z-coord of {_centerApply}
+                                add 4 to y-coord of {_centerApply}
+
+                                if block above {_centerApply} is not slab:
+                                    if chance of 0.5%:
+                                        set block at {_centerApply} to lantern[hanging=true]
+
+                                        add 1 to {_throttle}
+                                        if {_throttle} > {@ThrottleCount}:
+                                            set {_throttle} to 0
+                                            wait for 1 ticks
+
+            wait for 5 ticks
+
+            #Treasure Placing
+            message "&7&oPlacing Treasures"
+
+            set {_throttle} to 0
+
+            loop arg 1 times:
+                loop arg 1 times:
+                    if loop-number-1 is not 1 or arg 1:
+                        if loop-number-2 is not 1 or arg 1:
+                            if {_map::%loop-number-1%::%loop-number-2%} is 0:
+                                set {_centerApply} to {generateCenter}
+                                remove round(arg 1 / 2) from x-coord of {_centerApply}
+                                remove round(arg 1 / 2) from z-coord of {_centerApply}
+                                add loop-number-1 to x-coord of {_centerApply}
+                                add loop-number-2 to z-coord of {_centerApply}
+
+                                if chance of 0.1%:
+                                    set {_chestRndFacing} to random element of chest[facing=north], chest[facing=south], chest[facing=east] and chest[facing=west]
+
+                                    set block at {_centerApply} to obsidian
+                                    add 1 to y-coord of {_centerApply}
+
+                                    set block at {_centerApply} to {_chestRndFacing}
+                                    loop 27 times:
+                                        if chance of 70%:
+                                            set {_addRndItem} to air
+                                        else if chance of 60%:
+                                            set {_addRndtrash} to random element of (random integer between 1 and 6 of torch), leather helmet, leather chestplate, leather leggings, leather boots, leather, (random integer between 2 and 4 of bone), (random integer between 1 and 4 of coal), (random integer between 1 and 6 of gunpowder), (random integer between 1 and 3 of emerald), feather, cobweb, mushroom, leather horse armor, raw copper, bowl and string
+                                            set {_addRndItem} to {_addRndtrash}
+                                        else if chance of 50%:
+                                            set {_addRndItem} to random integer between 1 and 3 of iron ingot
+                                        else if chance of 70%:
+                                            set {_addRndItem} to random integer between 1 and 3 of gold ingot
+                                        else if chance of 50%:
+                                            set {_addRndItem} to random integer between 1 and 2 of diamond
+                                        else if chance of 40%:
+                                            set {_addRndItem} to random integer between 1 and 2 of netherite scrap
+                                        else if chance of 90%:
+                                            set {_addRndItem} to banner pattern
+                                        else if chance of 90%:
+                                            set {_addRndItem} to turtle egg
+                                        else if chance of 50%:
+                                            set {_addRndItem} to netherite sword of sharpness 5 and smite 5 and bane of arthropods 5 damaged by random integer between 50 and 1000
+                                        else if chance of 50%:
+                                            set {_semiTreasure} to random element of scute, netherite ingot, villager spawn egg, enchanted golden apple, (random integer between 4 and 10 of golden apple) and totem of undying
+                                        else:
+                                            set {_addRndItem} to music disc
+
+
+
+                                        set slot loop-number-3 of block at {_centerApply}'s inventory to {_addRndItem}
+
+                                    add 1 to y-coord of {_centerApply}
+                                    set block at {_centerApply} to obsidian
+                                    add 1 to y-coord of {_centerApply}
+                                    set block at {_centerApply} to soul lantern
+
+                                    add 3 to {_throttle}
+                                    if {_throttle} > {@ThrottleCount}:
+                                        set {_throttle} to 0
+                                        wait for 2 ticks
+
+            message "&a&lSuccessfully done to generate"
+
+
+        else:
+            message "&c&oOP required"
+
+
